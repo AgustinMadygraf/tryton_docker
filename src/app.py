@@ -1,6 +1,6 @@
-#Tryton\src\tryton_app\main.py
+#Tryton\src\app.py
 import subprocess
-from ..logs.config_logger import configurar_logging
+from .logs.config_logger import configurar_logging
 import time
 
 # Configurar el logger
@@ -17,9 +17,10 @@ def run_docker_command(docker_command, success_message, error_message):
 
 def countdown(seconds, message):
     for i in range(seconds, 0, -1):
-        logger.info(f"{message} en {i} segundos...", end="\r")
+        print(f"{message} en {i} segundos...", end="\r")
         time.sleep(1)
-    logger.info(" " * 50, end="\r")  # Clear the line after countdown
+    print(" " * 50, end="\r")  # Clear the line after countdown
+    logger.info(f"{message} finalizado.")
 
 def check_docker():
     while True:
