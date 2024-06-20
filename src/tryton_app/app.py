@@ -1,6 +1,6 @@
 #Tryton\src\tryton_app\main.py
 import subprocess
-from logs.config_logger import configurar_logging
+from ..logs.config_logger import configurar_logging
 import time
 
 # Configurar el logger
@@ -92,7 +92,7 @@ def setup_tryton_database():
             logger.error(f"Failed to set up Tryton database")
             countdown(10, "Reintentando configuración de la base de datos de Tryton")
 
-def main():
+def run_app():
     check_docker()
     
     if not is_docker_running():
@@ -121,7 +121,3 @@ def main():
                 setup_tryton_database()
     
     countdown(10, "Finalizando")
-    input("Presiona Enter para salir...")
-
-if __name__ == "__main__":
-    main()
