@@ -6,9 +6,9 @@ import time
 # Configurar el logger
 logger = configurar_logging()
 
-def run_docker_command(command, success_message, error_message):
+def run_docker_command(docker_command, success_message, error_message):
     try:
-        result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        result = subprocess.run(docker_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         logger.info(success_message)
         return result.stdout.decode()
     except subprocess.CalledProcessError as e:
@@ -17,9 +17,9 @@ def run_docker_command(command, success_message, error_message):
 
 def countdown(seconds, message):
     for i in range(seconds, 0, -1):
-        print(f"{message} en {i} segundos...", end="\r")
+        logger.info(f"{message} en {i} segundos...", end="\r")
         time.sleep(1)
-    print(" " * 50, end="\r")  # Clear the line after countdown
+    logger.info(" " * 50, end="\r")  # Clear the line after countdown
 
 def check_docker():
     while True:
@@ -92,7 +92,7 @@ def setup_tryton_database():
             logger.error(f"Failed to set up Tryton database")
             countdown(10, "Reintentando configuración de la base de datos de Tryton")
 
-def run_app():
+def main():
     check_docker()
     
     if not is_docker_running():
