@@ -24,6 +24,6 @@ class InfoErrorFilter(logging.Filter):
         # Permitir solo registros de nivel INFO y ERROR
         return record.levelno in (logging.INFO, logging.ERROR)
 
-
 # Configurar el logger con un nivel específico
-configurar_logging()
+logger = configurar_logging()
+logger.addFilter(InfoErrorFilter())
