@@ -1,12 +1,8 @@
 # tests/test_docker_operations.py
 import subprocess
-import os
-import sys
 import unittest
 from unittest.mock import patch, MagicMock
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
-
-from ..src.docker_operations import run_docker_command, check_if_container_exists, create_and_start_container, setup_tryton_database
+from src.docker_operations import run_docker_command, check_if_container_exists, create_and_start_container, setup_tryton_database
 
 class TestDockerOperations(unittest.TestCase):
     
