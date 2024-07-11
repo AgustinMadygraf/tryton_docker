@@ -1,10 +1,10 @@
 #Tryton/src/container_manager.py
 import subprocess
-from .logs.config_logger import configurar_logging
 from .utils.command_utils import countdown
+from src.logs.config_logger import LoggerConfigurator
 
-# Configurar el logger
-logger = configurar_logging()
+logger_configurator = LoggerConfigurator()
+logger = logger_configurator.get_logger()
 
 DOCKER_COMMANDS = {
     "tryton-postgres": [

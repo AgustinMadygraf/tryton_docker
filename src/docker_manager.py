@@ -1,9 +1,9 @@
 import subprocess
-from .logs.config_logger import configurar_logging
 from .utils.command_utils import countdown
+from src.logs.config_logger import LoggerConfigurator
 
-# Configurar el logger
-logger = configurar_logging()
+logger_configurator = LoggerConfigurator()
+logger = logger_configurator.get_logger()
 
 class DockerManager:
     RETRY_COUNT = 3

@@ -1,11 +1,11 @@
 # Tryton\src\app.py
-from .logs.config_logger import configurar_logging
 from .docker_manager import DockerManager
 from .container_manager import ContainerManager
 from .utils.command_utils import countdown
+from src.logs.config_logger import LoggerConfigurator
 
-# Configurar el logger
-logger = configurar_logging()
+logger_configurator = LoggerConfigurator()
+logger = logger_configurator.get_logger()
 
 CONTAINERS = ["tryton-postgres", "tryton"]
 
