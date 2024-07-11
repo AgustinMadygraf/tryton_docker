@@ -1,7 +1,6 @@
 #AnalizadorDeProyecto/src/models/update_repo.py
 import os
 import subprocess
-import logging
 from src.logs.config_logger import LoggerConfigurator
 
 class RepoUpdater:
