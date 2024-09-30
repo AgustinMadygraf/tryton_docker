@@ -1,4 +1,8 @@
 <?php
+"""
+index.php
+Ejecutar un script de Python con Pipenv desde PHP
+"""
 // Definir la ruta completa de pipenv
 $pipenv_path = 'C:\Users\\MAQ-BOLSAS\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python311\\Scripts\\pipenv.exe'; // Ajusta la ruta de pipenv
 $script_path = 'C:\\AppServ\\www\\Tryton\\run.py'; // Ajusta la ruta de run.py
@@ -7,7 +11,6 @@ $script_path = 'C:\\AppServ\\www\\Tryton\\run.py'; // Ajusta la ruta de run.py
 if (!file_exists($pipenv_path)) {
     die("Error: pipenv.exe no se encuentra en la ruta especificada.");
 }
-
 if (!file_exists($script_path)) {
     die("Error: run.py no se encuentra en la ruta especificada.");
 }
