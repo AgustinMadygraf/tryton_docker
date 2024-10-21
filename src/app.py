@@ -3,6 +3,8 @@ from .docker_manager import DockerManager
 from .container_manager import ContainerManager
 from .utils.command_utils import countdown
 from src.logs.config_logger import LoggerConfigurator
+from pyngrok import ngrok
+
 
 logger_configurator = LoggerConfigurator()
 logger = logger_configurator.get_logger()
@@ -23,6 +25,11 @@ def manage_containers(container_manager, containers):
             if container == "tryton-postgres":
                 container_manager.setup_tryton_database()
 
+def start_ngrok():
+    # Inicia un túnel HTTP en el puerto 5000
+    http_tunnel = ngrok.connect(5000)
+    print(f" * ngrok tunnel \"{http_tunnel.public_url}\" -> \"http://localhost:8000\"")
+
 def main():
     docker_manager = DockerManager()
     container_manager = ContainerManager()
@@ -30,3 +37,4 @@ def main():
     manage_containers(container_manager, CONTAINERS)
     countdown(10, "Finalizando")
     logger.info("Tryton está listo para usarse. Abre tu navegador en http://localhost:8000 e inicia sesión con tus credenciales.")
+    start_ngrok()
