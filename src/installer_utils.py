@@ -88,7 +88,7 @@ class BatFileCreator:
         ruta_archivo_bat = self.project_dir / f"{self.name_proj}.bat"
 
         contenido_bat = f"""
-        pipenv run python "{ruta_app_py}"
+        python -m pipenv run python "{ruta_app_py}"
         """
 
         with open(ruta_archivo_bat, 'w') as archivo_bat:

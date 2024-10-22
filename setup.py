@@ -6,7 +6,7 @@ from pathlib import Path
 
 class DependencyChecker:
     def __init__(self):
-        self.dependencies = ["subprocess", "os", "pathlib", "winshell", "win32com.client", "pywintypes","colorlog"]
+        self.dependencies = ["subprocess", "os", "pathlib", "winshell", "pywin32", "colorlog"]
 
     def check_dependencies(self):
         missing_dependencies = self.get_missing_dependencies()
