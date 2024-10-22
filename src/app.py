@@ -26,31 +26,42 @@ def manage_containers(container_manager, containers):
             if container == "tryton-postgres":
                 container_manager.setup_tryton_database()
 
-def start_ngrok():
-    try:
-        # Configurar ngrok
-        conf.get_default().region = "us"  # Cambia la región si es necesario
+class NgrokManager:
+    """Gestiona la configuración y conexión de ngrok."""
 
-        # Inicia un túnel HTTP en el puerto 8000
-        http_tunnel_8000 = ngrok.connect(8000)
-        print(f" * ngrok tunnel \"{http_tunnel_8000.public_url}\" -> \"http://localhost:8000\"")
+    def __init__(self, logger):
+        self.logger = logger
+
+    def start_tunnel(self, port=8000):
+        try:
+            # Configurar ngrok
+            conf.get_default().region = "us"  # Cambia la región si es necesario
+
+            # Inicia un túnel HTTP
+            tunnel = ngrok.connect(port)
+            print(f" * ngrok tunnel \"{tunnel.public_url}\" -> \"http://localhost:{port}\"")
+            
+            # Registrar la función de cierre para asegurarse de que los túneles se cierren correctamente
+            atexit.register(ngrok.disconnect, tunnel.public_url)
+            return tunnel.public_url
+
+        except PyngrokNgrokError as e:
+            self.logger.error(f"Error al iniciar ngrok: {e}")
+            if "ERR_NGROK_3200" in str(e):
+                self.logger.error("Tunnel not found. Please check your ngrok configuration.")
+        except Exception as e:
+            self.logger.error(f"Error inesperado: {e}")
 
 
-        # Registrar la función de cierre para asegurarse de que los túneles se cierren correctamente
-        atexit.register(ngrok.disconnect, http_tunnel_8000.public_url)
-
-    except PyngrokNgrokError as e:
-        print(f"Error al iniciar ngrok: {e}")
-        if "ERR_NGROK_3200" in str(e):
-            print("Tunnel not found. Please check your ngrok configuration and try again.")
-    except Exception as e:
-        print(f"Error inesperado: {e}")
 
 def main():
     docker_manager = DockerManager()
     container_manager = ContainerManager()
     docker_manager.initialize_docker()
     manage_containers(container_manager, CONTAINERS)
-    start_ngrok()
-    logger.info("Tryton está listo para usarse. Abre tu navegador en http://localhost:8000 e inicia sesión con tus credenciales.")
-    countdown(10, "Finalizando")
+    # Iniciar ngrok
+    ngrok_manager = NgrokManager(logger)
+    public_url = ngrok_manager.start_tunnel(8000)
+    logger.info(f"Tryton está listo para usarse en {public_url}. Abre tu navegador e inicia sesión.")
+
+    countdown(3, "Finalizando")
