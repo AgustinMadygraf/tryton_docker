@@ -1,10 +1,11 @@
-# Tryton\src\app.py
+"""
+Tryton_py\src\app.py
+Este módulo se encarga de gestionar los contenedores Docker y mantener la aplicación en ejecución.
+"""
 from .docker_manager import DockerManager
 from .container_manager import ContainerManager
-from .utils.command_utils import countdown
 from src.logs.config_logger import LoggerConfigurator
-import atexit
-
+from threading import Thread
 
 logger_configurator = LoggerConfigurator()
 logger = logger_configurator.get_logger()
@@ -32,9 +33,16 @@ def main():
     container_manager = ContainerManager()
     try:
         docker_manager.initialize_docker()
-        manage_containers(container_manager, CONTAINERS)
-        logger.info(f"Tryton está listo para usarse en {public_url}. Abre tu navegador e inicia sesión.")
-        countdown(3, "Finalizando")
+        
+        # Ejecutar el manejo de contenedores en segundo plano
+        thread = Thread(target=manage_containers, args=(container_manager, CONTAINERS))
+        thread.start()
+
+        url= "localhost:8000"
+        logger.info(f"Tryton está listo para usarse en {url}. Abre tu navegador e inicia sesión.")
+        
+        # Mantener la aplicación en ejecución
+        input("Presiona Enter para finalizar...")
+
     except SystemExit as e:
         print(e)
-        # Opcionalmente, maneja la excepción de manera adicional o termina el programa de manera más amigable

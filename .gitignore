@@ -6,3 +6,4 @@ src/utils/__pycache__
 tests/__pycache__/
 src/models/__pycache__/
 Tryton.bat
+.pylintrc
