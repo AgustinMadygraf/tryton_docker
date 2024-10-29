@@ -1,5 +1,9 @@
+"""
+tryton_py/src/docker_manager.py
+Este módulo se encarga de gestionar Docker y verificar si está instalado y en ejecución.
+"""
 import subprocess
-import webbrowser
+import time
 import shutil
 from .utils.command_utils import countdown
 from src.logs.config_logger import LoggerConfigurator
@@ -11,21 +15,15 @@ class DockerManager:
     RETRY_COUNT = 3
 
     def __init__(self):
-        self.logger = logger
+        self.docker_desktop_path = r"C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
     def check_docker(self):
         try:
-            if not shutil.which('docker'):
-                self.logger.error("Docker no está instalado o no está en el PATH. Por favor, asegúrate de que Docker esté correctamente instalado.")
-                raise FileNotFoundError("Docker no está en el PATH. Asegúrate de que Docker esté instalado y configurado correctamente.")
-            
-            self.run_docker_command(['docker', '--version'], "Docker está instalado.", "Docker no está instalado o no está en el PATH.")
-        
-        except FileNotFoundError as e:
-            self.logger.error(f"Error: {e}")
-            print("Docker no está instalado o no está en el PATH. Visita la siguiente URL para más información:")
-            print("https://docs.docker.com/get-started/get-docker/")
-            webbrowser.open("https://docs.docker.com/get-started/get-docker/")
+            result = subprocess.run(['docker', '--version'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            logger.info(f"Docker version: {result.stdout.decode().strip()}")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Error verificando Docker: {e.stderr.decode().strip()}")
+            raise
 
     def is_docker_running(self):
         """Verifica si Docker Desktop está en ejecución."""
@@ -37,33 +35,32 @@ class DockerManager:
             for _ in range(self.RETRY_COUNT):
                 try:
                     result = subprocess.run(['docker', 'info'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    if "Server" in result.stdout.decode():
-                        self.logger.info("Docker Desktop está en ejecución.")
-                        return True
+                    logger.info("Docker está en ejecución.")
+                    return True
                 except subprocess.CalledProcessError as e:
-                    self.logger.error(f"Error verificando el estado de Docker Desktop: {e.stderr.decode().strip()}")
-                    countdown(10, "Reintentando verificación del estado de Docker Desktop")
+                    logger.error(f"Error verificando el estado de Docker: {e.stderr.decode().strip()}")
+                    return False
+        except Exception as e:
+            logger.error(f"Excepción al verificar Docker: {str(e)}")
             return False
 
-        except FileNotFoundError as e:
-            self.logger.error(f"Error: {e}")
-            print("Docker no está instalado o no está en el PATH. Visita la siguiente URL para más información:")
-            print("https://docs.docker.com/get-started/get-docker/")
-            webbrowser.open("https://docs.docker.com/get-started/get-docker/")
-            raise SystemExit("Docker no está instalado o no está en el PATH.")
+    def start_docker_desktop(self):
+        try:
+            logger.info("Iniciando Docker Desktop...")
+            subprocess.Popen([self.docker_desktop_path], shell=True)
+            time.sleep(30)  # Espera para que Docker Desktop se inicie
+            if self.is_docker_running():
+                logger.info("Docker Desktop iniciado exitosamente.")
+            else:
+                logger.error("No se pudo iniciar Docker Desktop.")
+        except Exception as e:
+            logger.error(f"Error iniciando Docker Desktop: {str(e)}")
+            raise
 
     def initialize_docker(self):
         """Inicializa Docker y verifica si está en ejecución."""
         self.check_docker()
         if not self.is_docker_running():
-            self.logger.error("Docker Desktop no está en ejecución. Por favor, inícialo y vuelve a intentarlo.")
-            raise SystemExit("Docker Desktop no está en ejecución. Por favor, inícialo y vuelve a intentarlo.")
-
-    def run_docker_command(self, docker_command, success_message, error_message):
-        try:
-            result = subprocess.run(docker_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            self.logger.info(success_message)
-            return result.stdout.decode()
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f"{error_message}: {e.stderr.decode().strip()}")
-            raise
+            self.start_docker_desktop()
+        else:
+            logger.info("Docker ya está en ejecución.")
