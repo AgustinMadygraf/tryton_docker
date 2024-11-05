@@ -1,0 +1,2 @@
+Sólo funciona correctamente cuando previamente está abierto el Docker Desktop. 
+Si no está abierto previamente, lo abre pero al finalizar el script se cierra el docker y con él se cierra tryton
