@@ -1,8 +1,7 @@
-# Tryton\run.py
-import sys
-import os
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
+"""
+Path: run.py
+Este script se encarga de ejecutar la aplicación principal.
+"""
 
 from src.app import main
 

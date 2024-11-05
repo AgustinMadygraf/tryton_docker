@@ -5,24 +5,26 @@ Este módulo se encarga de gestionar Docker y verificar si está instalado y en 
 import subprocess
 import time
 import shutil
-from .utils.command_utils import countdown
 from src.logs.config_logger import LoggerConfigurator
 
 logger_configurator = LoggerConfigurator()
 logger = logger_configurator.get_logger()
 
 class DockerManager:
+    """Clase para gestionar Docker Desktop."""
     RETRY_COUNT = 3
 
     def __init__(self):
         self.docker_desktop_path = r"C:\Program Files\Docker\Docker\Docker Desktop.exe"
 
     def check_docker(self):
+        """Verifica si Docker Desktop está instalado."""
         try:
-            result = subprocess.run(['docker', '--version'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            logger.info(f"Docker version: {result.stdout.decode().strip()}")
+            result = subprocess.run(['docker', '--version'],
+                                    check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            logger.info("Docker version: %s", result.stdout.decode().strip())
         except subprocess.CalledProcessError as e:
-            logger.error(f"Error verificando Docker: {e.stderr.decode().strip()}")
+            logger.error("Error verificando Docker: %s", e.stderr.decode().strip())
             raise
 
     def is_docker_running(self):
@@ -34,17 +36,26 @@ class DockerManager:
 
             for _ in range(self.RETRY_COUNT):
                 try:
-                    result = subprocess.run(['docker', 'info'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    subprocess.run(['docker', 'info'], check=True,
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     logger.info("Docker está en ejecución.")
                     return True
                 except subprocess.CalledProcessError as e:
-                    logger.error(f"Error verificando el estado de Docker: {e.stderr.decode().strip()}")
+                    logger.error("Error verificando el estado de Docker: %s",
+                                 e.stderr.decode().strip())
                     return False
-        except Exception as e:
-            logger.error(f"Excepción al verificar Docker: {str(e)}")
+        except FileNotFoundError as e:
+            logger.error("Archivo no encontrado: %s", str(e))
+            return False
+        except subprocess.CalledProcessError as e:
+            logger.error("Error en el proceso de Docker: %s", str(e))
+            return False
+        except (OSError, subprocess.SubprocessError) as e:
+            logger.error("Error inesperado al verificar Docker: %s", str(e))
             return False
 
     def start_docker_desktop(self):
+        """Inicia Docker Desktop."""
         try:
             logger.info("Iniciando Docker Desktop...")
             subprocess.Popen([self.docker_desktop_path], shell=True)
@@ -54,7 +65,7 @@ class DockerManager:
             else:
                 logger.error("No se pudo iniciar Docker Desktop.")
         except Exception as e:
-            logger.error(f"Error iniciando Docker Desktop: {str(e)}")
+            logger.error("Error iniciando Docker Desktop: %s", str(e))
             raise
 
     def initialize_docker(self):
