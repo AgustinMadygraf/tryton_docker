@@ -5,5 +5,5 @@ docs/00-Prompt-for-ProjectAnalysis.md
 src/utils/__pycache__
 tests/__pycache__/
 src/models/__pycache__/
-Tryton.bat
+tryton_docker.bat
 .pylintrc
